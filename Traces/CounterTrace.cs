@@ -39,7 +39,8 @@ public struct CounterTrace<T> : IDisposable
 			StackTrace = StackTraceHelper.GetStackTrace( 2 );
 
 		StartTicks = Stopwatch.GetTimestamp();
-		Update( initialValue );
+		LastValue = initialValue;
+		WriteEvent();
 	}
 
 	/// <summary>
@@ -52,7 +53,11 @@ public struct CounterTrace<T> : IDisposable
 			return;
 
 		LastValue = newValue;
+		WriteEvent();
+	}
 
+	private void WriteEvent()
+	{
 		var elapsedTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, Stopwatch.GetTimestamp() );
 		var traceEvent = new TraceEvent
 		{
@@ -63,7 +68,7 @@ public struct CounterTrace<T> : IDisposable
 			Timestamp = elapsedTime.TotalMicroseconds,
 			Arguments =
 			{
-				{ "value", newValue?.ToString() ?? "null" }
+				{ "value", LastValue?.ToString() ?? "null" }
 			}
 		};
 
