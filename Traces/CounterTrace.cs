@@ -8,7 +8,8 @@ namespace PerformanceTracing.Traces;
 /// <summary>
 /// A trace that logs changes to a value.
 /// </summary>
-public readonly struct CounterTrace : IDisposable
+/// <typeparam name="T">The type of value to change.</typeparam>
+public struct CounterTrace<T> : IDisposable
 {
 	private string Name { get; }
 	private string Categories { get; }
@@ -17,16 +18,18 @@ public readonly struct CounterTrace : IDisposable
 	private string? StackTrace { get; }
 	private long StartTicks { get; }
 
+	private T? LastValue { get; set; } = default;
+
 	/// <summary>
 	/// Do not use.
 	/// </summary>
 	/// <exception cref="InvalidOperationException">Always thrown.</exception>
 	public CounterTrace()
 	{
-		throw new InvalidOperationException( $"Use one of the {nameof( CounterTrace )} static constructors" );
+		throw new InvalidOperationException( $"Use one of the {nameof( CounterTrace<T> )} static constructors" );
 	}
 
-	private CounterTrace( string name, IEnumerable<string> categories, object? initialValue, string? filePath = null, int? lineNumber = null )
+	private CounterTrace( string name, IEnumerable<string> categories, T? initialValue, string? filePath = null, int? lineNumber = null )
 	{
 		Name = name;
 		Categories = string.Join( ',', categories );
@@ -43,10 +46,12 @@ public readonly struct CounterTrace : IDisposable
 	/// Updates the value of the trace.
 	/// </summary>
 	/// <param name="newValue">The new value of the trace.</param>
-	public void Update( object? newValue )
+	public void Update( T? newValue )
 	{
-		if ( !Tracing.IsRunning )
+		if ( !Tracing.IsRunning || EqualityComparer<T?>.Default.Equals( LastValue, newValue ) )
 			return;
+
+		LastValue = newValue;
 
 		var elapsedTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, Stopwatch.GetTimestamp() );
 		var traceEvent = new TraceEvent
@@ -80,37 +85,37 @@ public readonly struct CounterTrace : IDisposable
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace"/>.
+	/// Creates a new <see cref="CounterTrace{T}"/>.
 	/// </summary>
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <returns></returns>
-	public static CounterTrace New( string name, object? initialValue )
+	public static CounterTrace<T> New( string name, T? initialValue )
 	{
 		return new( name, Array.Empty<string>(), initialValue );
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace"/>.
+	/// Creates a new <see cref="CounterTrace{T}"/>.
 	/// </summary>
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="categories">The categories to give the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <returns></returns>
-	public static CounterTrace New( string name, IEnumerable<string> categories, object? initialValue )
+	public static CounterTrace<T> New( string name, IEnumerable<string> categories, T? initialValue )
 	{
 		return new( name, categories, initialValue );
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace"/>.
+	/// Creates a new <see cref="CounterTrace{T}"/>.
 	/// </summary>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <param name="name">Do not use.</param>
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
 	/// <returns></returns>
-	public static CounterTrace New( object? initialValue,
+	public static CounterTrace<T> New( T? initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
@@ -122,7 +127,7 @@ public readonly struct CounterTrace : IDisposable
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace"/>.
+	/// Creates a new <see cref="CounterTrace{T}"/>.
 	/// </summary>
 	/// <param name="categories">The categories to give the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
@@ -130,7 +135,7 @@ public readonly struct CounterTrace : IDisposable
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
 	/// <returns></returns>
-	public static CounterTrace New( IEnumerable<string> categories, object? initialValue,
+	public static CounterTrace<T> New( IEnumerable<string> categories, T? initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
