@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace PerformanceTracing.Traces;
@@ -11,7 +12,7 @@ namespace PerformanceTracing.Traces;
 public readonly struct PerformanceTrace : IDisposable
 {
 	private string Name { get; }
-	private string Categories { get; }
+	private string Categories { get; } = "Uncategorized";
 	private string? FilePath { get; }
 	private int? LineNumber { get; } = null;
 	private string? StackTrace { get; }
@@ -29,7 +30,8 @@ public readonly struct PerformanceTrace : IDisposable
 	private PerformanceTrace( string name, IEnumerable<string> categories, string? filePath = null, int? lineNumber = null )
 	{
 		Name = name;
-		Categories = string.Join( ',', categories );
+		if ( categories.Any() )
+			Categories = string.Join( ',', categories );
 		FilePath = filePath;
 		LineNumber = lineNumber;
 		if ( Tracing.IsRunning && Tracing.Options!.AppendStackTrace )

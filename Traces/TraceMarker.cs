@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PerformanceTracing.Traces;
 
@@ -81,7 +82,7 @@ public static class TraceMarker
 		var traceEvent = new TraceEvent
 		{
 			Name = name ?? "Unknown",
-			Categories = string.Join( ',', categories ),
+			Categories = categories.Any() ? string.Join( ',', categories ) : "Uncategorized",
 			ThreadId = Tracing.ThreadId,
 			EventType = "R",
 			Timestamp = startTime.TotalMicroseconds

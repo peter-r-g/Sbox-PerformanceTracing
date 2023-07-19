@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace PerformanceTracing.Traces;
@@ -12,7 +13,7 @@ namespace PerformanceTracing.Traces;
 public class CounterTrace<T> : IDisposable
 {
 	private string Name { get; }
-	private string Categories { get; }
+	private string Categories { get; } = "Uncategorized";
 	private string? FilePath { get; }
 	private int? LineNumber { get; }
 	private string? StackTrace { get; }
@@ -22,7 +23,8 @@ public class CounterTrace<T> : IDisposable
 	private CounterTrace( string name, IEnumerable<string> categories, T? initialValue, string? filePath = null, int? lineNumber = null )
 	{
 		Name = name;
-		Categories = string.Join( ',', categories );
+		if ( categories.Any() )
+			Categories = string.Join( ',', categories );
 		FilePath = filePath;
 		LineNumber = lineNumber;
 		if ( Tracing.IsRunning && Tracing.Options!.AppendStackTrace )

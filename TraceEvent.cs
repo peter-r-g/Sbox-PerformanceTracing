@@ -8,7 +8,7 @@ internal struct TraceEvent
 	[JsonPropertyName( "name" )]
 	public string Name { get; set; } = "Unknown";
 	[JsonPropertyName( "cat" )]
-	public string Categories { get; set; } = "None";
+	public string Categories { get; set; } = "Uncategorized";
 	[JsonPropertyName( "ph" )]
 	public string EventType { get; set; } = string.Empty;
 	[JsonPropertyName( "ts" )]
