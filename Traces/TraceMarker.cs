@@ -95,7 +95,7 @@ public static class TraceMarker
 			traceEvent.Arguments.Add( "filePath", filePath );
 
 		if ( Tracing.Options.AppendLineNumber && lineNumber is not null )
-			traceEvent.Arguments.Add( "lineNumber", lineNumber.Value.ToString() );
+			traceEvent.Arguments.Add( "lineNumber", lineNumber.Value );
 
 		Tracing.Events.Add( traceEvent );
 	}

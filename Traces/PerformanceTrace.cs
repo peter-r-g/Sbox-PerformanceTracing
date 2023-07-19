@@ -65,7 +65,7 @@ public readonly struct PerformanceTrace : IDisposable
 			traceEvent.Arguments.Add( "filePath", FilePath );
 
 		if ( Tracing.Options.AppendLineNumber && LineNumber is not null )
-			traceEvent.Arguments.Add( "lineNumber", LineNumber.Value.ToString() );
+			traceEvent.Arguments.Add( "lineNumber", LineNumber.Value );
 
 		Tracing.Events.Add( traceEvent );
 	}

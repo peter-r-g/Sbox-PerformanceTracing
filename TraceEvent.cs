@@ -20,7 +20,7 @@ internal struct TraceEvent
 	[JsonPropertyName( "tid" )]
 	public int ThreadId { get; set; } = 1;
 	[JsonPropertyName( "args" )]
-	public Dictionary<string, string> Arguments { get; init; } = new();
+	public Dictionary<string, object?> Arguments { get; init; } = new();
 
 	public TraceEvent()
 	{
