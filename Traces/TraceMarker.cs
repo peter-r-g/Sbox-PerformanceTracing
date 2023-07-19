@@ -77,9 +77,6 @@ public static class TraceMarker
 		if ( !Tracing.IsRunning )
 			throw new InvalidOperationException( "There is no trace running" );
 
-		if ( !Tracing.Options!.UseSimpleNames )
-			name = StackTraceHelper.GetTraceEntrySignature( 1 );
-
 		var startTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, startTicks );
 		var traceEvent = new TraceEvent
 		{
