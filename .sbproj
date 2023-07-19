@@ -1,0 +1,28 @@
+{
+  "Title": "Performance Tracing",
+  "Type": "library",
+  "Org": "gooman",
+  "Ident": "perf_tracing",
+  "Tags": null,
+  "Schema": 1,
+  "HasAssets": false,
+  "AssetsPath": "",
+  "Resources": null,
+  "MenuResources": null,
+  "HasCode": true,
+  "CodePath": ".",
+  "PackageReferences": [],
+  "EditorReferences": null,
+  "Metadata": {
+    "ProjectTemplate": null,
+    "CsProjName": "",
+    "Compiler": {
+      "RootNamespace": "PerformanceTracing",
+      "DefineConstants": "SANDBOX;ADDON;DEBUG",
+      "NoWarn": "1701;1702;",
+      "Nullables": true,
+      "References": [],
+      "DistinctReferences": []
+    }
+  }
+}
