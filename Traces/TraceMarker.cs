@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 
-namespace PerformanceTracing;
+namespace PerformanceTracing.Traces;
 
 /// <summary>
 /// A trace that marks a point in time.
