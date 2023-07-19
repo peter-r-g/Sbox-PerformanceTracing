@@ -48,7 +48,7 @@ public readonly struct CounterTrace : IDisposable
 		if ( !Tracing.IsRunning )
 			return;
 
-		var elapsedTime = Stopwatch.GetElapsedTime( StartTicks ) + Tracing.StartTime;
+		var elapsedTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, Stopwatch.GetTimestamp() );
 		var traceEvent = new TraceEvent
 		{
 			Name = Name,
