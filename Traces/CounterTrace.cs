@@ -67,15 +67,6 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 			}
 		};
 
-		if ( Tracing.Options!.AppendStackTrace )
-			traceEvent.Arguments.Add( "stackTrace", StackTrace! );
-
-		if ( Tracing.Options.AppendFilePath && FilePath is not null )
-			traceEvent.Arguments.Add( "filePath", FilePath );
-
-		if ( Tracing.Options.AppendLineNumber && LineNumber is not null )
-			traceEvent.Arguments.Add( "lineNumber", LineNumber.Value.ToString() );
-
 		Tracing.Events.Add( traceEvent );
 	}
 
