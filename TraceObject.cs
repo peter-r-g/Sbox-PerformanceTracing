@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 
 namespace PerformanceTracing;
 
-internal struct TraceObject
+internal sealed class TraceObject
 {
 	[JsonPropertyName( "traceEvents" )]
 	public List<TraceEvent> TraceEvents { get; set; } = new();
