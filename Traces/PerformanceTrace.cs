@@ -14,7 +14,7 @@ public readonly struct PerformanceTrace : IDisposable
 	private string Name { get; }
 	private string Categories { get; } = "Uncategorized";
 	private string? FilePath { get; }
-	private int? LineNumber { get; } = null;
+	private int? LineNumber { get; }
 	private string? StackTrace { get; }
 	private long StartTicks { get; }
 
