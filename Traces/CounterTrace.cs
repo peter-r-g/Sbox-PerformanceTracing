@@ -17,7 +17,6 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 	private string Categories { get; } = "Uncategorized";
 	private string? FilePath { get; }
 	private int? LineNumber { get; }
-	private string? StackTrace { get; }
 
 	private T LastValue { get; set; }
 
@@ -28,8 +27,6 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 			Categories = string.Join( ',', categories );
 		FilePath = filePath;
 		LineNumber = lineNumber;
-		if ( Tracing.IsRunning && Tracing.Options!.AppendStackTrace )
-			StackTrace = StackTraceHelper.GetStackTrace( 2 );
 
 		LastValue = initialValue;
 		WriteEvent();
@@ -66,6 +63,9 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 				{ Name, LastValue }
 			}
 		};
+
+		if ( Tracing.Options!.AppendCallerPath && FilePath is not null && LineNumber is not null )
+			traceEvent.Location = FilePath + ':' + LineNumber;
 
 		Tracing.Events.Add( traceEvent );
 	}

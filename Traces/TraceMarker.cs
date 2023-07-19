@@ -91,11 +91,12 @@ public static class TraceMarker
 		if ( Tracing.Options!.AppendStackTrace )
 			traceEvent.Arguments.Add( "stackTrace", StackTraceHelper.GetStackTrace( 2 ) );
 
-		if ( Tracing.Options.AppendFilePath && filePath is not null )
-			traceEvent.Arguments.Add( "filePath", filePath );
-
-		if ( Tracing.Options.AppendLineNumber && lineNumber is not null )
-			traceEvent.Arguments.Add( "lineNumber", lineNumber.Value );
+		if ( Tracing.Options!.AppendCallerPath && filePath is not null && lineNumber is not null )
+		{
+			var location = filePath + ':' + lineNumber;
+			traceEvent.Location = location;
+			traceEvent.Arguments.Add( "location", location );
+		}
 
 		Tracing.Events.Add( traceEvent );
 	}

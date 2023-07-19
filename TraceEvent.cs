@@ -19,6 +19,8 @@ internal struct TraceEvent
 	public int ProcessId { get; set; } = 1;
 	[JsonPropertyName( "tid" )]
 	public int ThreadId { get; set; } = 1;
+	[JsonPropertyName( "loc" )]
+	public string Location { get; set; } = string.Empty;
 	[JsonPropertyName( "args" )]
 	public Dictionary<string, object?> Arguments { get; init; } = new();
 

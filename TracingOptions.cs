@@ -17,13 +17,9 @@ public sealed class TracingOptions
 	/// </summary>
 	public bool AppendStackTrace { get; set; } = false;
 	/// <summary>
-	/// Whether or not to append invoking file paths to all applicable events.
+	/// Whether or not to append caller paths to applicable events.
 	/// </summary>
-	public bool AppendFilePath { get; set; } = false;
-	/// <summary>
-	/// Whether or not to append invoking line numbers to all applicable events.
-	/// </summary>
-	public bool AppendLineNumber { get; set; } = false;
+	public bool AppendCallerPath { get; set; } = false;
 	/// <summary>
 	/// Whether or not to use simple method names.
 	/// If true, this will replace method names with its fully qualified name in a stack trace.
@@ -48,8 +44,7 @@ public sealed class TracingOptions
 	public TracingOptions( TracingOptions other )
 	{
 		AppendStackTrace = other.AppendStackTrace;
-		AppendFilePath = other.AppendFilePath;
-		AppendLineNumber = other.AppendLineNumber;
+		AppendCallerPath = other.AppendCallerPath;
 		UseSimpleNames = other.UseSimpleNames;
 	}
 
@@ -64,22 +59,12 @@ public sealed class TracingOptions
 	}
 
 	/// <summary>
-	/// Sets the <see cref="AppendFilePath"/> option.
+	/// Sets the <see cref="AppendCallerPath"/> option.
 	/// </summary>
 	/// <returns>The same options instance.</returns>
-	public TracingOptions WithAppendFilePath( bool appendFilePath )
+	public TracingOptions WithAppendCallerPath( bool appendCallerPath )
 	{
-		AppendFilePath = appendFilePath;
-		return this;
-	}
-
-	/// <summary>
-	/// Sets the <see cref="AppendLineNumber"/> option.
-	/// </summary>
-	/// <returns>The same options instance.</returns>
-	public TracingOptions WithAppendLineNumber( bool appendLineNumber )
-	{
-		AppendLineNumber = appendLineNumber;
+		AppendCallerPath = appendCallerPath;
 		return this;
 	}
 

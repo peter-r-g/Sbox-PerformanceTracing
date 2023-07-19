@@ -61,11 +61,12 @@ public readonly struct PerformanceTrace : IDisposable
 		if ( Tracing.Options!.AppendStackTrace )
 			traceEvent.Arguments.Add( "stackTrace", StackTrace! );
 
-		if ( Tracing.Options.AppendFilePath && FilePath is not null )
-			traceEvent.Arguments.Add( "filePath", FilePath );
-
-		if ( Tracing.Options.AppendLineNumber && LineNumber is not null )
-			traceEvent.Arguments.Add( "lineNumber", LineNumber.Value );
+		if ( Tracing.Options!.AppendCallerPath && FilePath is not null && LineNumber is not null )
+		{
+			var location = FilePath + ':' + LineNumber;
+			traceEvent.Location = location;
+			traceEvent.Arguments.Add( "location", location );
+		}
 
 		Tracing.Events.Add( traceEvent );
 	}
