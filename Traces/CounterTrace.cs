@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace PerformanceTracing.Traces;
@@ -10,7 +11,7 @@ namespace PerformanceTracing.Traces;
 /// A trace that logs changes to a value.
 /// </summary>
 /// <typeparam name="T">The type of value to change.</typeparam>
-public class CounterTrace<T> : IDisposable
+public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 {
 	private string Name { get; }
 	private string Categories { get; } = "Uncategorized";
@@ -18,9 +19,9 @@ public class CounterTrace<T> : IDisposable
 	private int? LineNumber { get; }
 	private string? StackTrace { get; }
 
-	private T? LastValue { get; set; }
+	private T LastValue { get; set; }
 
-	private CounterTrace( string name, IEnumerable<string> categories, T? initialValue, string? filePath = null, int? lineNumber = null )
+	private CounterTrace( string name, IEnumerable<string> categories, T initialValue, string? filePath = null, int? lineNumber = null )
 	{
 		Name = name;
 		if ( categories.Any() )
@@ -38,7 +39,7 @@ public class CounterTrace<T> : IDisposable
 	/// Updates the value of the trace.
 	/// </summary>
 	/// <param name="newValue">The new value of the trace.</param>
-	public void Update( T? newValue )
+	public void Update( T newValue )
 	{
 		if ( !Tracing.IsRunning )
 			return;
@@ -62,7 +63,7 @@ public class CounterTrace<T> : IDisposable
 			Timestamp = elapsedTime.TotalMicroseconds,
 			Arguments =
 			{
-				{ "value", LastValue?.ToString() ?? "null" }
+				{ Name, LastValue }
 			}
 		};
 
@@ -90,7 +91,7 @@ public class CounterTrace<T> : IDisposable
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( string name, T? initialValue )
+	public static CounterTrace<T> New( string name, T initialValue )
 	{
 		return new( name, Array.Empty<string>(), initialValue );
 	}
@@ -102,7 +103,7 @@ public class CounterTrace<T> : IDisposable
 	/// <param name="categories">The categories to give the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( string name, IEnumerable<string> categories, T? initialValue )
+	public static CounterTrace<T> New( string name, IEnumerable<string> categories, T initialValue )
 	{
 		return new( name, categories, initialValue );
 	}
@@ -115,7 +116,7 @@ public class CounterTrace<T> : IDisposable
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( T? initialValue,
+	public static CounterTrace<T> New( T initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
@@ -135,7 +136,7 @@ public class CounterTrace<T> : IDisposable
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( IEnumerable<string> categories, T? initialValue,
+	public static CounterTrace<T> New( IEnumerable<string> categories, T initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
