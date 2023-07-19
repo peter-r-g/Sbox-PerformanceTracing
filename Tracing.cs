@@ -1,6 +1,7 @@
 ﻿using Sandbox;
 using Sandbox.UI;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace PerformanceTracing;
@@ -17,7 +18,7 @@ public static class Tracing
 
 	internal static TracingOptions? Options { get; private set; }
 	internal static TimeSpan StartTime => CurrentTraceObject!.StartTime;
-	internal static ICollection<TraceEvent> Events => CurrentTraceObject!.TraceEvents;
+	internal static ConcurrentBag<TraceEvent> Events => CurrentTraceObject!.TraceEvents;
 	private static TraceObject? CurrentTraceObject { get; set; }
 
 	internal static int ThreadId => ThreadSafe.IsMainThread ? 1 : 2;

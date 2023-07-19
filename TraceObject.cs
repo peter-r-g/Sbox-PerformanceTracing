@@ -1,5 +1,6 @@
 ﻿using Sandbox;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
@@ -9,7 +10,7 @@ namespace PerformanceTracing;
 internal sealed class TraceObject
 {
 	[JsonPropertyName( "traceEvents" )]
-	public List<TraceEvent> TraceEvents { get; set; } = new();
+	public ConcurrentBag<TraceEvent> TraceEvents { get; set; } = new();
 	[JsonPropertyName( "otherData" )]
 	public Dictionary<string, object?> OtherData { get; init; } = new()
 	{
