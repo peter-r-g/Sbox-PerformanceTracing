@@ -16,9 +16,9 @@ public static class Tracing
 	public static bool IsRunning { get; private set; }
 
 	internal static TracingOptions? Options { get; private set; }
-	internal static TimeSpan StartTime => CurrentTraceObject.StartTime;
-	internal static ICollection<TraceEvent> Events => CurrentTraceObject.TraceEvents;
-	private static TraceObject CurrentTraceObject { get; set; }
+	internal static TimeSpan StartTime => CurrentTraceObject!.StartTime;
+	internal static ICollection<TraceEvent> Events => CurrentTraceObject!.TraceEvents;
+	private static TraceObject? CurrentTraceObject { get; set; }
 
 	internal static int ThreadId => ThreadSafe.IsMainThread ? 1 : 2;
 
