@@ -9,25 +9,15 @@ namespace PerformanceTracing.Traces;
 /// A trace that logs changes to a value.
 /// </summary>
 /// <typeparam name="T">The type of value to change.</typeparam>
-public struct CounterTrace<T> : IDisposable
+public class CounterTrace<T> : IDisposable
 {
 	private string Name { get; }
 	private string Categories { get; }
 	private string? FilePath { get; }
 	private int? LineNumber { get; }
 	private string? StackTrace { get; }
-	private long StartTicks { get; }
 
-	private T? LastValue { get; set; } = default;
-
-	/// <summary>
-	/// Do not use.
-	/// </summary>
-	/// <exception cref="InvalidOperationException">Always thrown.</exception>
-	public CounterTrace()
-	{
-		throw new InvalidOperationException( $"Use one of the {nameof( CounterTrace<T> )} static constructors" );
-	}
+	private T? LastValue { get; set; }
 
 	private CounterTrace( string name, IEnumerable<string> categories, T? initialValue, string? filePath = null, int? lineNumber = null )
 	{
@@ -38,7 +28,6 @@ public struct CounterTrace<T> : IDisposable
 		if ( Tracing.IsRunning && Tracing.Options!.AppendStackTrace )
 			StackTrace = StackTraceHelper.GetStackTrace( 2 );
 
-		StartTicks = Stopwatch.GetTimestamp();
 		LastValue = initialValue;
 		WriteEvent();
 	}
@@ -49,7 +38,10 @@ public struct CounterTrace<T> : IDisposable
 	/// <param name="newValue">The new value of the trace.</param>
 	public void Update( T? newValue )
 	{
-		if ( !Tracing.IsRunning || EqualityComparer<T?>.Default.Equals( LastValue, newValue ) )
+		if ( !Tracing.IsRunning )
+			return;
+
+		if ( EqualityComparer<T>.Default.Equals( LastValue, newValue ) )
 			return;
 
 		LastValue = newValue;
@@ -85,8 +77,9 @@ public struct CounterTrace<T> : IDisposable
 	}
 
 	/// <inheritdoc/>
-	public readonly void Dispose()
+	public void Dispose()
 	{
+		GC.SuppressFinalize( this );
 	}
 
 	/// <summary>
