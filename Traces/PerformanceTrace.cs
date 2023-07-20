@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -9,25 +10,18 @@ namespace PerformanceTracing.Traces;
 /// <summary>
 /// A trace that logs the duration of a block of code.
 /// </summary>
-public readonly struct PerformanceTrace : IDisposable
+public sealed class PerformanceTrace : IDisposable
 {
-	private string Name { get; }
-	private string Categories { get; } = "Uncategorized";
-	private string? FilePath { get; }
-	private int? LineNumber { get; }
-	private string? StackTrace { get; }
-	private long StartTicks { get; }
+	internal static ConcurrentQueue<PerformanceTrace> UnusedTraces { get; } = new();
 
-	/// <summary>
-	/// Do not use.
-	/// </summary>
-	/// <exception cref="InvalidOperationException">Always thrown.</exception>
-	public PerformanceTrace()
-	{
-		throw new InvalidOperationException( $"Use one of the {nameof( PerformanceTrace )} static constructors" );
-	}
+	private string Name { get; set; } = string.Empty;
+	private string Categories { get; set; } = "Uncategorized";
+	private string? FilePath { get; set; }
+	private int? LineNumber { get; set; }
+	private string? StackTrace { get; set; }
+	private long StartTicks { get; set; }
 
-	private PerformanceTrace( string name, IEnumerable<string> categories, string? filePath = null, int? lineNumber = null )
+	private void Initialize( string name, IEnumerable<string> categories, string? filePath = null, int? lineNumber = null )
 	{
 		Name = name;
 		if ( categories.Any() )
@@ -69,6 +63,8 @@ public readonly struct PerformanceTrace : IDisposable
 		}
 
 		Tracing.Events.Add( traceEvent );
+
+		UnusedTraces.Enqueue( this );
 	}
 
 	/// <summary>
@@ -77,7 +73,11 @@ public readonly struct PerformanceTrace : IDisposable
 	/// <param name="name">The name of the trace.</param>
 	public static PerformanceTrace New( string name )
 	{
-		return new( name, Array.Empty<string>() );
+		if ( !UnusedTraces.TryDequeue( out var trace ) )
+			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
+
+		trace.Initialize( name, Array.Empty<string>() );
+		return trace;
 	}
 
 	/// <summary>
@@ -87,7 +87,11 @@ public readonly struct PerformanceTrace : IDisposable
 	/// <param name="categories">The categories to give the trace.</param>
 	public static PerformanceTrace New( string name, IEnumerable<string> categories )
 	{
-		return new( name, categories );
+		if ( !UnusedTraces.TryDequeue( out var trace ) )
+			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
+
+		trace.Initialize( name, categories );
+		return trace;
 	}
 
 	/// <summary>
@@ -100,10 +104,14 @@ public readonly struct PerformanceTrace : IDisposable
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
+		if ( !UnusedTraces.TryDequeue( out var trace ) )
+			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
+
 		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
-		return new( name ?? "Unknown", Array.Empty<string>(), filePath, lineNumber );
+		trace.Initialize( name ?? "Unknown", Array.Empty<string>(), filePath, lineNumber );
+		return trace;
 	}
 
 	/// <summary>
@@ -118,9 +126,20 @@ public readonly struct PerformanceTrace : IDisposable
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
+		if ( !UnusedTraces.TryDequeue( out var trace ) )
+			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
+
 		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
-		return new( name ?? "Unknown", categories, filePath, lineNumber );
+		trace.Initialize( name ?? "Unknown", categories, filePath, lineNumber );
+		return trace;
+	}
+
+	internal static void InitializeCache()
+	{
+		UnusedTraces.Clear();
+		for ( var i = 0; i < Tracing.Options!.MaxConcurrentTraces[TraceType.Performance]; i++ )
+			UnusedTraces.Enqueue( new PerformanceTrace() );
 	}
 }

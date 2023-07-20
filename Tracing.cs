@@ -1,8 +1,8 @@
-﻿using Sandbox;
+﻿using PerformanceTracing.Traces;
+using Sandbox;
 using Sandbox.UI;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 
 namespace PerformanceTracing;
 
@@ -30,6 +30,8 @@ public static class Tracing
 	public static void Start( TracingOptions? options = null )
 	{
 		Options = new TracingOptions( options ?? TracingOptions.Default );
+
+		PerformanceTrace.InitializeCache();
 
 		CurrentTraceObject = new TraceObject()
 		{

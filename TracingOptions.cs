@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace PerformanceTracing;
 
@@ -31,6 +32,19 @@ public sealed class TracingOptions
 	public bool UseSimpleNames { get; set; } = false;
 
 	/// <summary>
+	/// Contains hard limits for how many of each type of trace can exist at once.
+	/// </summary>
+	/// <remarks>
+	/// For <see cref="TraceType.Performance"/>, this limit will be for each generic type.
+	/// For <see cref="TraceType.Marker"/>, this has no effect.
+	/// </remarks>
+	public Dictionary<TraceType, int> MaxConcurrentTraces { get; } = new()
+	{
+		{ TraceType.Counter, 20 },
+		{ TraceType.Performance, 50 }
+	};
+
+	/// <summary>
 	/// Initializes a default instance of <see cref="TracingOptions"/>.
 	/// </summary>
 	public TracingOptions()
@@ -46,6 +60,7 @@ public sealed class TracingOptions
 		AppendStackTrace = other.AppendStackTrace;
 		AppendCallerPath = other.AppendCallerPath;
 		UseSimpleNames = other.UseSimpleNames;
+		MaxConcurrentTraces = other.MaxConcurrentTraces;
 	}
 
 	/// <summary>
@@ -75,6 +90,18 @@ public sealed class TracingOptions
 	public TracingOptions WithUseSimpleNames( bool useSimpleNames )
 	{
 		UseSimpleNames = useSimpleNames;
+		return this;
+	}
+
+	/// <summary>
+	/// Sets the <see cref="MaxConcurrentTraces"/> for the provided <see cref="TraceType"/>.
+	/// </summary>
+	/// <param name="type">The type of trace you are setting the limit for.</param>
+	/// <param name="max">The maximum amount of traces that can exist at once.</param>
+	/// <returns>The same options instance.</returns>
+	public TracingOptions WithMaxConcurrentTrace( TraceType type, int max )
+	{
+		MaxConcurrentTraces[type] = max;
 		return this;
 	}
 }
