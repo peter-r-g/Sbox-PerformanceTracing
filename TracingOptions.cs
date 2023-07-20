@@ -99,7 +99,7 @@ public sealed class TracingOptions
 	/// <param name="type">The type of trace you are setting the limit for.</param>
 	/// <param name="max">The maximum amount of traces that can exist at once.</param>
 	/// <returns>The same options instance.</returns>
-	public TracingOptions WithMaxConcurrentTrace( TraceType type, int max )
+	public TracingOptions WithMaxConcurrentTraces( TraceType type, int max )
 	{
 		MaxConcurrentTraces[type] = max;
 		return this;
