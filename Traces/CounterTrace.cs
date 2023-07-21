@@ -93,6 +93,9 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 	/// <returns></returns>
 	public static CounterTrace<T> New( string name, T initialValue )
 	{
+		if ( !Tracing.IsRunning )
+			return new CounterTrace<T>();
+
 		if ( UnusedTraces is null )
 			InitializeCache();
 
@@ -112,6 +115,9 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 	/// <returns></returns>
 	public static CounterTrace<T> New( string name, IEnumerable<string> categories, T initialValue )
 	{
+		if ( !Tracing.IsRunning )
+			return new CounterTrace<T>();
+
 		if ( UnusedTraces is null )
 			InitializeCache();
 
@@ -135,10 +141,13 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
+		if ( !Tracing.IsRunning )
+			return new CounterTrace<T>();
+
 		if ( UnusedTraces is null )
 			InitializeCache();
 
-		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
+		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )
@@ -162,10 +171,13 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
+		if ( !Tracing.IsRunning )
+			return new CounterTrace<T>();
+
 		if ( UnusedTraces is null )
 			InitializeCache();
 
-		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
+		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )

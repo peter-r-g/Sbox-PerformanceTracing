@@ -17,6 +17,9 @@ public static class TraceMarker
 	/// <param name="name">The name of the marker.</param>
 	public static void New( string name )
 	{
+		if ( !Tracing.IsRunning )
+			return;
+
 		AddMarker( name, Array.Empty<string>() );
 	}
 
@@ -27,6 +30,9 @@ public static class TraceMarker
 	/// <param name="categories">The categories to give the marker.</param>
 	public static void New( string name, IEnumerable<string> categories )
 	{
+		if ( !Tracing.IsRunning )
+			return;
+
 		AddMarker( name, categories );
 	}
 
@@ -40,6 +46,9 @@ public static class TraceMarker
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
+		if ( !Tracing.IsRunning )
+			return;
+
 		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
@@ -58,7 +67,10 @@ public static class TraceMarker
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
-		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
+		if ( !Tracing.IsRunning )
+			return;
+
+		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
 		AddMarker( name ?? "Unknown", categories, filePath, lineNumber );
@@ -75,9 +87,6 @@ public static class TraceMarker
 	private static void AddMarker( string name, IEnumerable<string> categories, string? filePath = null, int? lineNumber = null )
 	{
 		var startTicks = Stopwatch.GetTimestamp();
-		if ( !Tracing.IsRunning )
-			throw new InvalidOperationException( "There is no trace running" );
-
 		var startTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, startTicks );
 		var traceEvent = new TraceEvent
 		{

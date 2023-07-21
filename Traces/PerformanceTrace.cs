@@ -73,6 +73,9 @@ public sealed class PerformanceTrace : IDisposable
 	/// <param name="name">The name of the trace.</param>
 	public static PerformanceTrace New( string name )
 	{
+		if ( !Tracing.IsRunning )
+			return new PerformanceTrace();
+
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
 
@@ -87,6 +90,9 @@ public sealed class PerformanceTrace : IDisposable
 	/// <param name="categories">The categories to give the trace.</param>
 	public static PerformanceTrace New( string name, IEnumerable<string> categories )
 	{
+		if ( !Tracing.IsRunning )
+			return new PerformanceTrace();
+
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
 
@@ -104,10 +110,13 @@ public sealed class PerformanceTrace : IDisposable
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
+		if ( !Tracing.IsRunning )
+			return new PerformanceTrace();
+
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
 
-		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
+		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
 		trace.Initialize( name ?? "Unknown", Array.Empty<string>(), filePath, lineNumber );
@@ -126,10 +135,13 @@ public sealed class PerformanceTrace : IDisposable
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
+		if ( !Tracing.IsRunning )
+			return new PerformanceTrace();
+
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
 
-		if ( Tracing.IsRunning && !Tracing.Options!.UseSimpleNames )
+		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
 		trace.Initialize( name ?? "Unknown", categories, filePath, lineNumber );
