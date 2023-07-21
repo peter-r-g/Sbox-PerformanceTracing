@@ -83,6 +83,25 @@ public static class Tracing
 		IsRunning = false;
 	}
 
+	/// <summary>
+	/// Adds some metadata to the currently running trace.
+	/// </summary>
+	/// <typeparam name="T">The type of the value to add to metadata.</typeparam>
+	/// <param name="key">The key to insert the metadata at.</param>
+	/// <param name="value">The value to store.</param>
+	/// <exception cref="InvalidOperationException">Thrown when trying to add metadata when no trace is running.</exception>
+	/// <exception cref="ArgumentException">Thrown when </exception>
+	public static void AddMetaData<T>( string key, T? value )
+	{
+		if ( !IsRunning )
+			throw new InvalidOperationException( "There is no trace running" );
+
+		if ( CurrentTraceObject!.MetaData.ContainsKey( key ) )
+			throw new ArgumentException( $"A metadata entry with the key \"{key}\" already exists" );
+
+		CurrentTraceObject.MetaData.Add( key, value );
+	}
+
 	#region Save Methods
 	/// <summary>
 	/// Copies all trace data to the clients clipboard.
