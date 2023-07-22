@@ -37,7 +37,7 @@ public sealed class TracingOptions
 	/// </summary>
 	/// <remarks>
 	/// For <see cref="TraceType.Performance"/>, this limit will be for each generic type.
-	/// For <see cref="TraceType.Marker"/>, this has no effect.
+	/// For <see cref="TraceType.Marker"/> and <see cref="TraceType.Meta"/> this has no effect.
 	/// </remarks>
 	public Dictionary<TraceType, int> MaxConcurrentTraces { get; } = new()
 	{

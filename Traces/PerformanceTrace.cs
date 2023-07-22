@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,7 +16,7 @@ public sealed class PerformanceTrace : IDisposable
 	internal static ConcurrentQueue<PerformanceTrace> UnusedTraces { get; } = new();
 
 	private string Name { get; set; } = string.Empty;
-	private string Categories { get; set; } = "Uncategorized";
+	private ImmutableArray<string> Categories { get; set; } = ImmutableArray.Create( "Uncategorized" );
 	private string? FilePath { get; set; }
 	private int? LineNumber { get; set; }
 	private string? StackTrace { get; set; }
@@ -25,7 +26,7 @@ public sealed class PerformanceTrace : IDisposable
 	{
 		Name = name;
 		if ( categories.Any() )
-			Categories = string.Join( ',', categories );
+			Categories = categories.ToImmutableArray();
 		FilePath = filePath;
 		LineNumber = lineNumber;
 		if ( Tracing.IsRunning && Tracing.Options!.AppendStackTrace )
@@ -47,20 +48,16 @@ public sealed class PerformanceTrace : IDisposable
 			Name = Name,
 			Categories = Categories,
 			ThreadId = Tracing.ThreadId,
-			EventType = "X",
+			Type = TraceType.Performance,
 			Timestamp = startTime.TotalMicroseconds,
 			Duration = elapsedTime.TotalMicroseconds
 		};
 
 		if ( Tracing.Options!.AppendStackTrace )
-			traceEvent.Arguments.Add( "stackTrace", StackTrace! );
+			traceEvent.StackTrace = StackTrace!;
 
 		if ( Tracing.Options!.AppendCallerPath && FilePath is not null && LineNumber is not null )
-		{
-			var location = FilePath + ':' + LineNumber;
-			traceEvent.Location = location;
-			traceEvent.Arguments.Add( "location", location );
-		}
+			traceEvent.Location = new SourceLocation( FilePath, LineNumber.Value );
 
 		Tracing.AddEvent( traceEvent );
 

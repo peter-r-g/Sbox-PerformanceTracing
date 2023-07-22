@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -20,7 +21,7 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 #pragma warning restore SB3000 // Hotloading not supported
 
 	private string Name { get; set; } = string.Empty;
-	private string Categories { get; set; } = "Uncategorized";
+	private ImmutableArray<string> Categories { get; set; } = ImmutableArray.Create( "Uncategorized" );
 	private string? FilePath { get; set; }
 	private int? LineNumber { get; set; }
 
@@ -30,7 +31,7 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 	{
 		Name = name;
 		if ( categories.Any() )
-			Categories = string.Join( ',', categories );
+			Categories = categories.ToImmutableArray();
 		FilePath = filePath;
 		LineNumber = lineNumber;
 
@@ -62,16 +63,13 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 			Name = Name,
 			Categories = Categories,
 			ThreadId = Tracing.ThreadId,
-			EventType = "C",
+			Type = TraceType.Counter,
 			Timestamp = elapsedTime.TotalMicroseconds,
-			Arguments =
-			{
-				{ Name, LastValue }
-			}
+			Value = LastValue
 		};
 
 		if ( Tracing.Options!.AppendCallerPath && FilePath is not null && LineNumber is not null )
-			traceEvent.Location = FilePath + ':' + LineNumber;
+			traceEvent.Location = new SourceLocation( FilePath, LineNumber.Value );
 
 		Tracing.AddEvent( traceEvent );
 	}

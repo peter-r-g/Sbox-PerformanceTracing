@@ -20,33 +20,17 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 			{
 				new TraceEvent
 				{
-					Name = "process_name",
-					EventType = "M",
-					ProcessId = 1,
-					Arguments =
-					{
-						{ "name", "S&box" }
-					}
-				},
-				new TraceEvent
-				{
 					Name = "thread_name",
-					EventType = "M",
+					Type = TraceType.Meta,
 					ThreadId = 1,
-					Arguments =
-					{
-						{ "name", "MainThread" }
-					}
+					Value = "MainThread"
 				},
 				new TraceEvent
 				{
 					Name = "thread_anem",
-					EventType = "M",
+					Type = TraceType.Meta,
 					ThreadId = 2,
-					Arguments =
-					{
-						{ "name", "UnknownThread" }
-					}
+					Value = "UnknownThread"
 				}
 			}
 		};

@@ -1,28 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Text.Json.Serialization;
+﻿using System.Collections.Immutable;
 
 namespace PerformanceTracing;
 
 public struct TraceEvent
 {
-	[JsonPropertyName( "name" )]
-	public string Name { get; set; } = "Unknown";
-	[JsonPropertyName( "cat" )]
-	public string Categories { get; set; } = "Uncategorized";
-	[JsonPropertyName( "ph" )]
-	public string EventType { get; set; } = string.Empty;
-	[JsonPropertyName( "ts" )]
-	public double Timestamp { get; set; }
-	[JsonPropertyName( "dur" )]
-	public double Duration { get; set; }
-	[JsonPropertyName( "pid" )]
-	public int ProcessId { get; set; } = 1;
-	[JsonPropertyName( "tid" )]
-	public int ThreadId { get; set; } = 1;
-	[JsonPropertyName( "loc" )]
-	public string Location { get; set; } = string.Empty;
-	[JsonPropertyName( "args" )]
-	public Dictionary<string, object?> Arguments { get; init; } = new();
+	public string Name { get; internal init; } = "Unknown";
+	public ImmutableArray<string> Categories { get; internal init; } = ImmutableArray.Create( "Uncategorized" );
+	public TraceType Type { get; internal init; }
+	public int ThreadId { get; internal init; } = 1;
+
+	public SourceLocation Location { get; internal set; } = SourceLocation.None;
+	public string StackTrace { get; internal set; } = string.Empty;
+
+	public double Timestamp { get; internal set; }
+	public double? Duration { get; internal set; }
+
+	public object? Value { get; internal set; }
 
 	public TraceEvent()
 	{

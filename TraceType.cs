@@ -16,5 +16,9 @@ public enum TraceType
 	/// <summary>
 	/// An execution time log.
 	/// </summary>
-	Performance
+	Performance,
+	/// <summary>
+	/// A setter for metadata.
+	/// </summary>
+	Meta
 }

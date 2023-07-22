@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Immutable;
 
 namespace PerformanceTracing.Traces;
 
@@ -91,21 +92,17 @@ public static class TraceMarker
 		var traceEvent = new TraceEvent
 		{
 			Name = name ?? "Unknown",
-			Categories = categories.Any() ? string.Join( ',', categories ) : "Uncategorized",
+			Categories = categories.Any() ? categories.ToImmutableArray() : ImmutableArray.Create( "Uncategorized" ),
 			ThreadId = Tracing.ThreadId,
-			EventType = "R",
+			Type = TraceType.Marker,
 			Timestamp = startTime.TotalMicroseconds
 		};
 
 		if ( Tracing.Options!.AppendStackTrace )
-			traceEvent.Arguments.Add( "stackTrace", StackTraceHelper.GetStackTrace( 2 ) );
+			traceEvent.StackTrace = StackTraceHelper.GetStackTrace( 2 );
 
 		if ( Tracing.Options!.AppendCallerPath && filePath is not null && lineNumber is not null )
-		{
-			var location = filePath + ':' + lineNumber;
-			traceEvent.Location = location;
-			traceEvent.Arguments.Add( "location", location );
-		}
+			traceEvent.Location = new SourceLocation( filePath, lineNumber.Value );
 
 		Tracing.AddEvent( traceEvent );
 	}
