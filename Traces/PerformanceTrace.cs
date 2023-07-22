@@ -41,7 +41,7 @@ public sealed class PerformanceTrace : IDisposable
 		if ( !Tracing.IsRunning )
 			return;
 
-		var startTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, StartTicks );
+		var startTime = Stopwatch.GetElapsedTime( Tracing.StartTimeTicks, StartTicks );
 		var traceEvent = new TraceEvent
 		{
 			Name = Name,
@@ -62,7 +62,7 @@ public sealed class PerformanceTrace : IDisposable
 			traceEvent.Arguments.Add( "location", location );
 		}
 
-		Tracing.Events.Add( traceEvent );
+		Tracing.AddEvent( traceEvent );
 
 		UnusedTraces.Enqueue( this );
 	}

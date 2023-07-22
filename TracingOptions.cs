@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using PerformanceTracing.Providers;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace PerformanceTracing;
@@ -43,6 +44,11 @@ public sealed class TracingOptions
 		{ TraceType.Counter, 20 },
 		{ TraceType.Performance, 50 }
 	};
+
+	/// <summary>
+	/// The provider to use to store and serialize traces.
+	/// </summary>
+	public TraceStorageProvider StorageProvider { get; set; } = new JsonStorageProvider();
 
 	/// <summary>
 	/// Initializes a default instance of <see cref="TracingOptions"/>.
@@ -102,6 +108,16 @@ public sealed class TracingOptions
 	public TracingOptions WithMaxConcurrentTraces( TraceType type, int max )
 	{
 		MaxConcurrentTraces[type] = max;
+		return this;
+	}
+
+	/// <summary>
+	/// Sets the <see cref="StorageProvider"/> option.
+	/// </summary>
+	/// <returns>The same options instance.</returns>
+	public TracingOptions WithStorageProvider<T>() where T : TraceStorageProvider, new()
+	{
+		StorageProvider = new T();
 		return this;
 	}
 }

@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace PerformanceTracing;
 
-internal struct TraceEvent
+public struct TraceEvent
 {
 	[JsonPropertyName( "name" )]
 	public string Name { get; set; } = "Unknown";

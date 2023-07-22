@@ -56,7 +56,7 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 
 	private void WriteEvent()
 	{
-		var elapsedTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, Stopwatch.GetTimestamp() );
+		var elapsedTime = Stopwatch.GetElapsedTime( Tracing.StartTimeTicks, Stopwatch.GetTimestamp() );
 		var traceEvent = new TraceEvent
 		{
 			Name = Name,
@@ -73,7 +73,7 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 		if ( Tracing.Options!.AppendCallerPath && FilePath is not null && LineNumber is not null )
 			traceEvent.Location = FilePath + ':' + LineNumber;
 
-		Tracing.Events.Add( traceEvent );
+		Tracing.AddEvent( traceEvent );
 	}
 
 	/// <inheritdoc/>

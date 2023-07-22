@@ -2,7 +2,9 @@
 using Sandbox;
 using Sandbox.UI;
 using System;
-using System.Collections.Concurrent;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace PerformanceTracing;
 
@@ -16,12 +18,9 @@ public static class Tracing
 	/// </summary>
 	public static bool IsRunning { get; private set; }
 
-	internal static TracingOptions? Options { get; private set; }
-	internal static TimeSpan StartTime => CurrentTraceObject!.StartTime;
-	internal static ConcurrentBag<TraceEvent> Events => CurrentTraceObject!.TraceEvents;
-	private static TraceObject? CurrentTraceObject { get; set; }
-
 	internal static int ThreadId => ThreadSafe.IsMainThread ? 1 : 2;
+	internal static TracingOptions? Options { get; private set; }
+	internal static long StartTimeTicks { get; private set; }
 
 	/// <summary>
 	/// Starts a new trace. If one is already running, it is overwritten.
@@ -32,45 +31,9 @@ public static class Tracing
 		Options = new TracingOptions( options ?? TracingOptions.Default );
 
 		PerformanceTrace.InitializeCache();
-
-		CurrentTraceObject = new TraceObject()
-		{
-			TraceEvents =
-			{
-				new TraceEvent
-				{
-					Name = "process_name",
-					EventType = "M",
-					ProcessId = 1,
-					Arguments =
-					{
-						{ "name", "S&box" }
-					}
-				},
-				new TraceEvent
-				{
-					Name = "thread_name",
-					EventType = "M",
-					ThreadId = 1,
-					Arguments =
-					{
-						{ "name", "MainThread" }
-					}
-				},
-				new TraceEvent
-				{
-					Name = "thread_anem",
-					EventType = "M",
-					ThreadId = 2,
-					Arguments =
-					{
-						{ "name", "UnknownThread" }
-					}
-				}
-			}
-		};
-
 		IsRunning = true;
+		StartTimeTicks = Stopwatch.GetTimestamp();
+		Options.StorageProvider.Start();
 	}
 
 	/// <summary>
@@ -78,7 +41,7 @@ public static class Tracing
 	/// </summary>
 	public static void Stop()
 	{
-		CurrentTraceObject = default;
+		Options?.StorageProvider.Stop();
 		Options = null;
 		IsRunning = false;
 	}
@@ -89,17 +52,17 @@ public static class Tracing
 	/// <typeparam name="T">The type of the value to add to metadata.</typeparam>
 	/// <param name="key">The key to insert the metadata at.</param>
 	/// <param name="value">The value to store.</param>
-	/// <exception cref="InvalidOperationException">Thrown when trying to add metadata when no trace is running.</exception>
-	/// <exception cref="ArgumentException">Thrown when </exception>
 	public static void AddMetaData<T>( string key, T? value )
 	{
 		if ( !IsRunning )
 			throw new InvalidOperationException( "There is no trace running" );
 
-		if ( CurrentTraceObject!.MetaData.ContainsKey( key ) )
-			throw new ArgumentException( $"A metadata entry with the key \"{key}\" already exists" );
+		Options!.StorageProvider.AddMetaData( key, value );
+	}
 
-		CurrentTraceObject.MetaData.Add( key, value );
+	internal static void AddEvent( in TraceEvent traceEvent )
+	{
+		Options!.StorageProvider.AddEvent( traceEvent );
 	}
 
 	#region Save Methods
@@ -115,7 +78,12 @@ public static class Tracing
 			throw new InvalidOperationException( "There is no trace running" );
 
 		Game.AssertClient();
-		Clipboard.SetText( Json.Serialize( CurrentTraceObject ) );
+
+		using ( var stream = new MemoryStream() )
+		{
+			Options!.StorageProvider.WriteToStream( stream );
+			Clipboard.SetText( Encoding.UTF8.GetString( stream.ToArray() ) );
+		}
 
 		if ( stopTracing )
 			Stop();
@@ -134,7 +102,8 @@ public static class Tracing
 			throw new InvalidOperationException( "There is no trace running" );
 
 		fs ??= FileSystem.Data;
-		fs.WriteJson( filePath, CurrentTraceObject );
+		using ( var stream = fs.OpenWrite( filePath ) )
+			Options!.StorageProvider.WriteToStream( stream );
 
 		if ( stopTracing )
 			Stop();

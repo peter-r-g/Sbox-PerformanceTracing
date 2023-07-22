@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json.Serialization;
 
-namespace PerformanceTracing;
+namespace PerformanceTracing.Providers;
 
 internal sealed class TraceObject
 {

@@ -87,7 +87,7 @@ public static class TraceMarker
 	private static void AddMarker( string name, IEnumerable<string> categories, string? filePath = null, int? lineNumber = null )
 	{
 		var startTicks = Stopwatch.GetTimestamp();
-		var startTime = Stopwatch.GetElapsedTime( Tracing.StartTime.Ticks, startTicks );
+		var startTime = Stopwatch.GetElapsedTime( Tracing.StartTimeTicks, startTicks );
 		var traceEvent = new TraceEvent
 		{
 			Name = name ?? "Unknown",
@@ -107,6 +107,6 @@ public static class TraceMarker
 			traceEvent.Arguments.Add( "location", location );
 		}
 
-		Tracing.Events.Add( traceEvent );
+		Tracing.AddEvent( traceEvent );
 	}
 }
