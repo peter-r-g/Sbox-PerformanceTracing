@@ -5,7 +5,7 @@ using System.Text.Json;
 namespace PerformanceTracing.Providers;
 
 /// <summary>
-/// A provider to save traces to JSON.
+/// A provider to save traces in chromes trace event JSON format.
 /// </summary>
 public sealed class JsonStorageProvider : TraceStorageProvider
 {
