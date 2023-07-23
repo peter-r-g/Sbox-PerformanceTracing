@@ -34,6 +34,7 @@ public abstract class TraceStorageProvider
 	/// Writes the providers data to a stream.
 	/// </summary>
 	/// <param name="stream">The stream to write to.</param>
+	/// <exception cref="NotSupportedException">Thrown when the implementing provider does not override this method.</exception>
 	public virtual void WriteToStream( Stream stream )
 	{
 		throw new NotSupportedException( nameof( WriteToStream ) );

@@ -23,6 +23,7 @@ public static class Tracing
 	/// </summary>
 	public const string Version = "1.0.0";
 
+	// FIXME: https://github.com/sboxgame/issues/issues/3679
 	internal static int ThreadId => ThreadSafe.IsMainThread ? 1 : 2;
 	internal static TracingOptions? Options { get; private set; }
 	internal static long StartTimeTicks { get; private set; }
@@ -112,6 +113,7 @@ public static class Tracing
 	/// <param name="stopTracing">Whether or not to stop tracing after copying the trace data to clipboard.</param>
 	/// <exception cref="InvalidOperationException">Thrown when trying to copy to clipboard when no trace is running.</exception>
 	/// <exception cref="Exception">Thrown when invoking this method from outside the client realm.</exception>
+	/// <exception cref="NotSupportedException">Thrown when the storage provider does not support writing data to a stream.</exception>
 	public static void CopyToClipboard( bool stopTracing = false )
 	{
 		if ( !IsRunning )
@@ -135,7 +137,8 @@ public static class Tracing
 	/// <param name="filePath">The path to the file to save.</param>
 	/// <param name="fs">The file system to save into. Defaults to <see cref="FileSystem.Data"/>.</param>
 	/// <param name="stopTracing">Whether or not to stop tracing after saving the trace data to the file.</param>
-	/// <exception cref="InvalidOperationException">Thrown when invoking this method from outside the client realm.</exception>
+	/// <exception cref="InvalidOperationException">Thrown when trying to save while there is no trace running.</exception>
+	/// <exception cref="NotSupportedException">Thrown when the storage provider does not support writing data to a stream.</exception>
 	public static void SaveToFile( string filePath, BaseFileSystem? fs = null, bool stopTracing = false )
 	{
 		if ( !IsRunning )

@@ -68,6 +68,7 @@ public sealed class PerformanceTrace : IDisposable
 	/// Creates a new <see cref="PerformanceTrace"/>.
 	/// </summary>
 	/// <param name="name">The name of the trace.</param>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static PerformanceTrace New( string name )
 	{
 		if ( !Tracing.IsRunning )
@@ -85,6 +86,7 @@ public sealed class PerformanceTrace : IDisposable
 	/// </summary>
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="categories">The categories to give the trace.</param>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static PerformanceTrace New( string name, IEnumerable<string> categories )
 	{
 		if ( !Tracing.IsRunning )
@@ -103,6 +105,7 @@ public sealed class PerformanceTrace : IDisposable
 	/// <param name="name">Do not use.</param>
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static PerformanceTrace New( [CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
@@ -127,6 +130,7 @@ public sealed class PerformanceTrace : IDisposable
 	/// <param name="name">Do not use.</param>
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static PerformanceTrace New( IEnumerable<string> categories,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,

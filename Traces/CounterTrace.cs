@@ -81,7 +81,7 @@ public sealed class CounterTrace : IDisposable
 	/// </summary>
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
-	/// <returns></returns>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static CounterTrace New( string name, double initialValue )
 	{
 		if ( !Tracing.IsRunning )
@@ -100,7 +100,7 @@ public sealed class CounterTrace : IDisposable
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="categories">The categories to give the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
-	/// <returns></returns>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static CounterTrace New( string name, IEnumerable<string> categories, double initialValue )
 	{
 		if ( !Tracing.IsRunning )
@@ -120,7 +120,7 @@ public sealed class CounterTrace : IDisposable
 	/// <param name="name">Do not use.</param>
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
-	/// <returns></returns>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static CounterTrace New( double initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
@@ -147,7 +147,7 @@ public sealed class CounterTrace : IDisposable
 	/// <param name="name">Do not use.</param>
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
-	/// <returns></returns>
+	/// <exception cref="InvalidOperationException">Thrown when exceeding the maximum amount of traces stored in the pool.</exception>
 	public static CounterTrace New( IEnumerable<string> categories, double initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
