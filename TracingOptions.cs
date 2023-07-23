@@ -17,10 +17,16 @@ public sealed class TracingOptions
 	/// <summary>
 	/// Whether or not to append stack traces to all applicable events.
 	/// </summary>
+	/// <remarks>
+	/// This can be very performance and storage intensive, if you are looking to limit overhead then set this to false.
+	/// </remarks>
 	public bool AppendStackTrace { get; set; } = false;
 	/// <summary>
 	/// Whether or not to append caller paths to applicable events.
 	/// </summary>
+	/// <remarks>
+	/// This will display absolute paths, be careful about leaking your name if you code in your users directory.
+	/// </remarks>
 	public bool AppendCallerPath { get; set; } = false;
 	/// <summary>
 	/// Whether or not to use simple method names.
@@ -29,6 +35,8 @@ public sealed class TracingOptions
 	/// </summary>
 	/// <remarks>
 	/// This only applies to method invocations that take a parameter marked with the <see cref="CallerMemberNameAttribute"/>.
+	/// <br/>
+	/// This can be quite performance intensive, if you are looking to limit overhead then set this to true.
 	/// </remarks>
 	public bool UseSimpleNames { get; set; } = false;
 
