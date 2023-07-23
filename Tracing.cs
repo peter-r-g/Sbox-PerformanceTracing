@@ -151,5 +151,26 @@ public static class Tracing
 		if ( stopTracing )
 			Stop();
 	}
+
+	/// <summary>
+	/// Gets a stream of trace data from the storage provider.
+	/// </summary>
+	/// <param name="stopTracing">Whether or not to stop tracing after retreiving the stream.</param>
+	/// <returns>An in-memory store of the data.</returns>
+	/// <exception cref="InvalidOperationException">Thrown when trying to get a stream while there is no trace running.</exception>
+	/// <exception cref="NotSupportedException">Thrown when the storage provider does not support writing data to a stream.</exception>
+	public static MemoryStream GetStream( bool stopTracing )
+	{
+		if ( !IsRunning )
+			throw new InvalidOperationException( "There is no trace running" );
+
+		var stream = new MemoryStream();
+		Options!.StorageProvider.WriteToStream( stream );
+
+		if ( stopTracing )
+			Stop();
+
+		return stream;
+	}
 	#endregion
 }
