@@ -49,8 +49,8 @@ public sealed class PerformanceTrace : IDisposable
 			Categories = Categories,
 			ThreadId = Tracing.ThreadId,
 			Type = TraceType.Performance,
-			Timestamp = startTime.TotalMicroseconds,
-			Duration = elapsedTime.TotalMicroseconds
+			Timestamp = startTime.TotalNanoseconds,
+			Duration = elapsedTime.TotalNanoseconds
 		};
 
 		if ( Tracing.Options!.AppendStackTrace )

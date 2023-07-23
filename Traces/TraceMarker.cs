@@ -95,7 +95,7 @@ public static class TraceMarker
 			Categories = categories.Any() ? categories.ToImmutableArray() : ImmutableArray.Create( "Uncategorized" ),
 			ThreadId = Tracing.ThreadId,
 			Type = TraceType.Marker,
-			Timestamp = startTime.TotalMicroseconds
+			Timestamp = startTime.TotalNanoseconds
 		};
 
 		if ( Tracing.Options!.AppendStackTrace )

@@ -60,7 +60,7 @@ public sealed class CounterTrace : IDisposable
 			Categories = Categories,
 			ThreadId = Tracing.ThreadId,
 			Type = TraceType.Counter,
-			Timestamp = elapsedTime.TotalMicroseconds,
+			Timestamp = elapsedTime.TotalNanoseconds,
 			Value = LastValue
 		};
 

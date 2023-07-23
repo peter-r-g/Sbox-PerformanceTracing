@@ -25,9 +25,10 @@ internal sealed class TraceEventConverter : JsonConverter<TraceEvent>
 		if ( value.Location != SourceLocation.None )
 			writer.WriteString( "loc", value.Location.ToString() );
 
-		writer.WriteNumber( "ts", value.Timestamp );
+		// Format accepts times as microseconds, not nanoseconds.
+		writer.WriteNumber( "ts", value.Timestamp / 1000 );
 		if ( value.Duration.HasValue )
-			writer.WriteNumber( "dur", value.Duration.Value );
+			writer.WriteNumber( "dur", value.Duration.Value / 1000 );
 
 		switch ( value.Type )
 		{
