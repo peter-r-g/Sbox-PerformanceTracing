@@ -10,7 +10,7 @@ public struct TraceEvent
 	public int ThreadId { get; internal init; } = 1;
 
 	public SourceLocation Location { get; internal set; } = SourceLocation.None;
-	public string StackTrace { get; internal set; } = string.Empty;
+	public string? StackTrace { get; internal set; }
 
 	public double Timestamp { get; internal set; }
 	public double? Duration { get; internal set; }
