@@ -1,4 +1,4 @@
-﻿using PerformanceTracing.Providers;
+﻿using PerformanceTracing.Providers.Json;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 

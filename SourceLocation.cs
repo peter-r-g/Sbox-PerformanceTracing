@@ -51,6 +51,12 @@ public readonly struct SourceLocation : IEquatable<SourceLocation>
 	}
 
 	/// <inheritdoc/>
+	public override string ToString()
+	{
+		return FilePath + ':' + LineNumber;
+	}
+
+	/// <inheritdoc/>
 	public static bool operator ==( SourceLocation left, SourceLocation right ) => left.Equals( right );
 	/// <inheritdoc/>
 	public static bool operator !=( SourceLocation left, SourceLocation right ) => !(left == right);

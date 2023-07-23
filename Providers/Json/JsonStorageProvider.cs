@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text.Json;
 
-namespace PerformanceTracing.Providers;
+namespace PerformanceTracing.Providers.Json;
 
 /// <summary>
 /// A provider to save traces in chromes trace event JSON format.
@@ -10,6 +10,13 @@ namespace PerformanceTracing.Providers;
 public sealed class JsonStorageProvider : TraceStorageProvider
 {
 	private static TraceObject? CurrentTraceObject { get; set; }
+	private static JsonSerializerOptions Options { get; } = new()
+	{
+		Converters =
+		{
+			new TraceEventConverter()
+		}
+	};
 
 	/// <inheritdoc/>
 	public override void Start()
@@ -63,6 +70,6 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 		if ( !stream.CanWrite )
 			throw new ArgumentException( "The stream cannot be written to", nameof( stream ) );
 
-		JsonSerializer.Serialize( stream, CurrentTraceObject );
+		JsonSerializer.Serialize( stream, CurrentTraceObject, Options );
 	}
 }
