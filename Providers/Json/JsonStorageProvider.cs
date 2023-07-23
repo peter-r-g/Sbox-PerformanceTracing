@@ -9,14 +9,32 @@ namespace PerformanceTracing.Providers.Json;
 /// </summary>
 public sealed class JsonStorageProvider : TraceStorageProvider
 {
-	private static TraceObject? CurrentTraceObject { get; set; }
-	private static JsonSerializerOptions Options { get; } = new()
+	private TraceObject? CurrentTraceObject { get; set; }
+	private JsonSerializerOptions Options { get; }
+
+	/// <summary>
+	/// Initializes a default instance of <see cref="JsonStorageProvider"/>.
+	/// </summary>
+	public JsonStorageProvider()
 	{
-		Converters =
+		Options = new JsonSerializerOptions()
 		{
-			new TraceEventConverter()
-		}
-	};
+			Converters =
+			{
+				new TraceEventConverter()
+			}
+		};
+	}
+
+	/// <summary>
+	/// Initializes a new instance of <see cref="JsonStorageProvider"/> with custom serializer options.
+	/// </summary>
+	/// <param name="options">The custom serializer options to use.</param>
+	public JsonStorageProvider( JsonSerializerOptions options )
+	{
+		options.Converters.Add( new TraceEventConverter() );
+		Options = options;
+	}
 
 	/// <inheritdoc/>
 	public override void Start()

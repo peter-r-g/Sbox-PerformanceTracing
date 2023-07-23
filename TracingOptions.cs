@@ -74,6 +74,7 @@ public sealed class TracingOptions
 		AppendCallerPath = other.AppendCallerPath;
 		UseSimpleNames = other.UseSimpleNames;
 		MaxConcurrentTraces = other.MaxConcurrentTraces;
+		StorageProvider = other.StorageProvider;
 	}
 
 	/// <summary>
@@ -125,6 +126,16 @@ public sealed class TracingOptions
 	public TracingOptions WithStorageProvider<T>() where T : TraceStorageProvider, new()
 	{
 		StorageProvider = new T();
+		return this;
+	}
+
+	/// <summary>
+	/// Sets the <see cref="StorageProvider"/> option.
+	/// </summary>
+	/// <returns>The same options instance.</returns>
+	public TracingOptions WithStorageProvider( TraceStorageProvider provider )
+	{
+		StorageProvider = provider;
 		return this;
 	}
 }
