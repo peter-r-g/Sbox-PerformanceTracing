@@ -18,6 +18,11 @@ public static class Tracing
 	/// </summary>
 	public static bool IsRunning { get; private set; }
 
+	/// <summary>
+	/// The current version of the Performance Tracing library.
+	/// </summary>
+	public const string Version = "1.0.0";
+
 	internal static int ThreadId => ThreadSafe.IsMainThread ? 1 : 2;
 	internal static TracingOptions? Options { get; private set; }
 	internal static long StartTimeTicks { get; private set; }
@@ -36,6 +41,39 @@ public static class Tracing
 		IsRunning = true;
 		StartTimeTicks = Stopwatch.GetTimestamp();
 		Options.StorageProvider.Start();
+		AddDefaultMetaData();
+	}
+	
+	private static void AddDefaultMetaData()
+	{
+		AddMetaData( "perfTracingVersion", Version );
+
+		if ( Game.IsServer )
+		{
+			AddMetaData( "realm", "server" );
+			AddMetaData( "serverSteamid", Game.ServerSteamId );
+			AddMetaData( "isDedicatedServer", Game.IsDedicatedServer );
+			AddMetaData( "tickRate", Game.TickRate );
+		}
+		else if ( Game.IsClient )
+		{
+			AddMetaData( "realm", "client" );
+			AddMetaData( "steamid", Game.SteamId );
+			AddMetaData( "isServerHost", Game.IsServerHost );
+			AddMetaData( "tickRate", Game.TickRate );
+		}
+		// Menu.
+		else
+		{
+			AddMetaData( "realm", "menu" );
+		}
+
+		if ( Game.IsDedicatedServer )
+			return;
+
+		AddMetaData( "isEditorRunning", Game.IsEditor );
+		AddMetaData( "isHandheld", Game.IsRunningOnHandheld );
+		AddMetaData( "isVr", Game.IsRunningInVR );
 	}
 
 	/// <summary>
