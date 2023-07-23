@@ -36,7 +36,6 @@ public sealed class TracingOptions
 	/// Contains hard limits for how many of each type of trace can exist at once.
 	/// </summary>
 	/// <remarks>
-	/// For <see cref="TraceType.Performance"/>, this limit will be for each generic type.
 	/// For <see cref="TraceType.Marker"/> and <see cref="TraceType.Meta"/> this has no effect.
 	/// </remarks>
 	public Dictionary<TraceType, int> MaxConcurrentTraces { get; } = new()

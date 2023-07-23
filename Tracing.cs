@@ -30,7 +30,9 @@ public static class Tracing
 	{
 		Options = new TracingOptions( options ?? TracingOptions.Default );
 
+		CounterTrace.InitializeCache();
 		PerformanceTrace.InitializeCache();
+
 		IsRunning = true;
 		StartTimeTicks = Stopwatch.GetTimestamp();
 		Options.StorageProvider.Start();

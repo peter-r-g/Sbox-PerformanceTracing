@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using System.Runtime.CompilerServices;
 
 namespace PerformanceTracing.Traces;
@@ -13,21 +12,18 @@ namespace PerformanceTracing.Traces;
 /// <summary>
 /// A trace that logs changes to a value.
 /// </summary>
-/// <typeparam name="T">The type of value to change.</typeparam>
-public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
+public sealed class CounterTrace : IDisposable
 {
-#pragma warning disable SB3000 // Hotloading not supported
-	internal static ConcurrentQueue<CounterTrace<T>>? UnusedTraces { get; set; }
-#pragma warning restore SB3000 // Hotloading not supported
+	internal static ConcurrentQueue<CounterTrace> UnusedTraces { get; } = new();
 
 	private string Name { get; set; } = string.Empty;
 	private ImmutableArray<string> Categories { get; set; } = ImmutableArray.Create( "Uncategorized" );
 	private string? FilePath { get; set; }
 	private int? LineNumber { get; set; }
 
-	private T LastValue { get; set; } = default!;
+	private double LastValue { get; set; }
 
-	private void Initialize( string name, IEnumerable<string> categories, T initialValue, string? filePath = null, int? lineNumber = null )
+	private void Initialize( string name, IEnumerable<string> categories, double initialValue, string? filePath = null, int? lineNumber = null )
 	{
 		Name = name;
 		if ( categories.Any() )
@@ -43,12 +39,12 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 	/// Updates the value of the trace.
 	/// </summary>
 	/// <param name="newValue">The new value of the trace.</param>
-	public void Update( T newValue )
+	public void Update( double newValue )
 	{
 		if ( !Tracing.IsRunning )
 			return;
 
-		if ( EqualityComparer<T>.Default.Equals( LastValue, newValue ) )
+		if ( LastValue == newValue )
 			return;
 
 		LastValue = newValue;
@@ -77,86 +73,74 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 	/// <inheritdoc/>
 	public void Dispose()
 	{
-		if ( UnusedTraces is null )
-			InitializeCache();
-
-		UnusedTraces!.Enqueue( this );
+		UnusedTraces.Enqueue( this );
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace{T}"/>.
+	/// Creates a new <see cref="CounterTrace"/>.
 	/// </summary>
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( string name, T initialValue )
+	public static CounterTrace New( string name, double initialValue )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace<T>();
-
-		if ( UnusedTraces is null )
-			InitializeCache();
+			return new CounterTrace();
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )
-			throw new InvalidOperationException( $"The {nameof( CounterTrace<T> )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
+			throw new InvalidOperationException( $"The {nameof( CounterTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
 
 		trace.Initialize( name, Array.Empty<string>(), initialValue );
 		return trace;
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace{T}"/>.
+	/// Creates a new <see cref="CounterTrace"/>.
 	/// </summary>
 	/// <param name="name">The name of the trace.</param>
 	/// <param name="categories">The categories to give the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( string name, IEnumerable<string> categories, T initialValue )
+	public static CounterTrace New( string name, IEnumerable<string> categories, double initialValue )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace<T>();
-
-		if ( UnusedTraces is null )
-			InitializeCache();
+			return new CounterTrace();
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )
-			throw new InvalidOperationException( $"The {nameof( CounterTrace<T> )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
+			throw new InvalidOperationException( $"The {nameof( CounterTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
 
 		trace.Initialize( name, categories, initialValue );
 		return trace;
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace{T}"/>.
+	/// Creates a new <see cref="CounterTrace"/>.
 	/// </summary>
 	/// <param name="initialValue">The first value to log for the trace.</param>
 	/// <param name="name">Do not use.</param>
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( T initialValue,
+	public static CounterTrace New( double initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace<T>();
-
-		if ( UnusedTraces is null )
-			InitializeCache();
+			return new CounterTrace();
 
 		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )
-			throw new InvalidOperationException( $"The {nameof( CounterTrace<T> )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
+			throw new InvalidOperationException( $"The {nameof( CounterTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
 
 		trace.Initialize( name ?? "Unknown", Array.Empty<string>(), initialValue, filePath, lineNumber );
 		return trace;
 	}
 
 	/// <summary>
-	/// Creates a new <see cref="CounterTrace{T}"/>.
+	/// Creates a new <see cref="CounterTrace"/>.
 	/// </summary>
 	/// <param name="categories">The categories to give the trace.</param>
 	/// <param name="initialValue">The first value to log for the trace.</param>
@@ -164,35 +148,28 @@ public sealed class CounterTrace<T> : IDisposable where T : notnull, INumber<T>
 	/// <param name="filePath">Do not use.</param>
 	/// <param name="lineNumber">Do not use.</param>
 	/// <returns></returns>
-	public static CounterTrace<T> New( IEnumerable<string> categories, T initialValue,
+	public static CounterTrace New( IEnumerable<string> categories, double initialValue,
 		[CallerMemberName] string? name = null,
 		[CallerFilePath] string? filePath = null,
 		[CallerLineNumber] int? lineNumber = null )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace<T>();
-
-		if ( UnusedTraces is null )
-			InitializeCache();
+			return new CounterTrace();
 
 		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )
-			throw new InvalidOperationException( $"The {nameof( CounterTrace<T> )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
+			throw new InvalidOperationException( $"The {nameof( CounterTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
 
 		trace.Initialize( name ?? "Unknown", categories, initialValue, filePath, lineNumber );
 		return trace;
 	}
 
-	[Event.Hotload]
-	private static void InitializeCache()
+	internal static void InitializeCache()
 	{
-		if ( !Tracing.IsRunning )
-			return;
-
-		UnusedTraces = new();
+		UnusedTraces.Clear();
 		for ( var i = 0; i < Tracing.Options!.MaxConcurrentTraces[TraceType.Counter]; i++ )
-			UnusedTraces.Enqueue( new CounterTrace<T>() );
+			UnusedTraces.Enqueue( new CounterTrace() );
 	}
 }

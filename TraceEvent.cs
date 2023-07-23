@@ -16,6 +16,8 @@ public struct TraceEvent
 	public double? Duration { get; internal set; }
 
 	public object? Value { get; internal set; }
+	public readonly double ValueNumber => (double)Value!;
+	public readonly string ValueString => (string)Value!;
 
 	public TraceEvent()
 	{
