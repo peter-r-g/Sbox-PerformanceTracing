@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Runtime.CompilerServices;
 
 namespace PerformanceTracing;
 
@@ -7,6 +8,7 @@ internal static class StackTraceHelper
 {
 	private static ConcurrentDictionary<string, string[]> StackTraceEntries { get; } = new();
 
+	[MethodImpl( MethodImplOptions.NoInlining )]
 	internal static string GetTraceEntrySignature( int entry = 0 )
 	{
 		entry += 2;
@@ -30,6 +32,7 @@ internal static class StackTraceHelper
 		return traceEntries[entry];
 	}
 
+	[MethodImpl( MethodImplOptions.NoInlining )]
 	internal static string GetStackTrace( int entry = 0 )
 	{
 		entry += 2;
