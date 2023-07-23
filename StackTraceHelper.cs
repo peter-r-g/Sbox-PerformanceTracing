@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
 
 namespace PerformanceTracing;
 
@@ -34,6 +33,14 @@ internal static class StackTraceHelper
 	internal static string GetStackTrace( int entry = 0 )
 	{
 		entry += 2;
-		return string.Join( '\n', Environment.StackTrace.Split( '\n' ).Skip( entry ).Select( str => str.Trim() ) );
+		ReadOnlySpan<char> stackTrace = Environment.StackTrace;
+
+		for ( var i = 0; i < entry; i++ )
+		{
+			var currentIndex = stackTrace.IndexOf( '\n' );
+			stackTrace = stackTrace[(currentIndex + 1)..];
+		}
+
+		return stackTrace.ToString();
 	}
 }
