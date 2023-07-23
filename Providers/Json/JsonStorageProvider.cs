@@ -73,7 +73,7 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 		if ( CurrentTraceObject!.MetaData.ContainsKey( key ) )
 			throw new ArgumentException( $"A metadata entry with the key \"{key}\" already exists" );
 
-		CurrentTraceObject.MetaData.Add(key, value);
+		CurrentTraceObject.MetaData.AddOrUpdate( key, value, ( key, value ) => value );
 	}
 
 	/// <inheritdoc/>
@@ -87,7 +87,7 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 	{
 		if ( !stream.CanWrite )
 			throw new ArgumentException( "The stream cannot be written to", nameof( stream ) );
-
-		JsonSerializer.Serialize( stream, CurrentTraceObject, Options );
+		
+		JsonSerializer.Serialize( stream, new TraceObject( CurrentTraceObject! ), Options );
 	}
 }
