@@ -1,4 +1,6 @@
-﻿using System;
+﻿using PerformanceTracing.Util;
+using Sandbox;
+using System;
 using System.IO;
 using System.Text.Json;
 
@@ -11,6 +13,8 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 {
 	private TraceObject? CurrentTraceObject { get; set; }
 	private JsonSerializerOptions Options { get; }
+
+	private ConcurrentHashSet<int>? NamedThreads { get; set; }
 
 	/// <summary>
 	/// Initializes a default instance of <see cref="JsonStorageProvider"/>.
@@ -39,32 +43,15 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 	/// <inheritdoc/>
 	public override void Start()
 	{
-		CurrentTraceObject = new TraceObject()
-		{
-			TraceEvents =
-			{
-				new TraceEvent
-				{
-					Name = "thread_name",
-					Type = TraceType.Meta,
-					ThreadId = 1,
-					Value = "MainThread"
-				},
-				new TraceEvent
-				{
-					Name = "thread_anem",
-					Type = TraceType.Meta,
-					ThreadId = 2,
-					Value = "UnknownThread"
-				}
-			}
-		};
+		CurrentTraceObject = new TraceObject();
+		NamedThreads = new ConcurrentHashSet<int>();
 	}
 
 	/// <inheritdoc/>
 	public override void Stop()
 	{
 		CurrentTraceObject = null;
+		NamedThreads = null;
 	}
 
 	/// <inheritdoc/>
@@ -79,6 +66,24 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 	/// <inheritdoc/>
 	public override void AddEvent( in TraceEvent traceEvent )
 	{
+		var threadId = ThreadSafe.CurrentThreadId;
+		if ( !NamedThreads!.Contains( threadId ) )
+		{
+			NamedThreads.TryAdd( threadId );
+
+			var threadName = ThreadSafe.CurrentThreadName ?? "UnknownThread";
+			if ( threadId == 1 )
+				threadName = "MainThread";
+
+			CurrentTraceObject!.TraceEvents.Add( new TraceEvent
+			{
+				Name = "thread_name",
+				Type = TraceType.Meta,
+				ThreadId = threadId,
+				Value = threadName
+			} );
+		}
+
 		CurrentTraceObject!.TraceEvents.Add( traceEvent );
 	}
 
