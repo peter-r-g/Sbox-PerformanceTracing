@@ -58,7 +58,7 @@ public sealed class CounterTrace : IDisposable
 		{
 			Name = Name,
 			Categories = Categories,
-			ThreadId = Tracing.ThreadId,
+			ThreadId = ThreadSafe.CurrentThreadId,
 			Type = TraceType.Counter,
 			Timestamp = elapsedTime.TotalNanoseconds,
 			Value = LastValue

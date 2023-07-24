@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Immutable;
+using Sandbox;
 
 namespace PerformanceTracing.Traces;
 
@@ -93,7 +94,7 @@ public static class TraceMarker
 		{
 			Name = name ?? "Unknown",
 			Categories = categories.Any() ? categories.ToImmutableArray() : ImmutableArray.Create( "Uncategorized" ),
-			ThreadId = Tracing.ThreadId,
+			ThreadId = ThreadSafe.CurrentThreadId,
 			Type = TraceType.Marker,
 			Timestamp = startTime.TotalNanoseconds
 		};

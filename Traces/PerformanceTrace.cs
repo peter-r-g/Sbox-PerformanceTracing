@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sandbox;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
@@ -47,7 +48,7 @@ public sealed class PerformanceTrace : IDisposable
 		{
 			Name = Name,
 			Categories = Categories,
-			ThreadId = Tracing.ThreadId,
+			ThreadId = ThreadSafe.CurrentThreadId,
 			Type = TraceType.Performance,
 			Timestamp = startTime.TotalNanoseconds,
 			Duration = elapsedTime.TotalNanoseconds

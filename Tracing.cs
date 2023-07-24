@@ -23,8 +23,6 @@ public static class Tracing
 	/// </summary>
 	public const string Version = "1.0.0";
 
-	// FIXME: https://github.com/sboxgame/issues/issues/3679
-	internal static int ThreadId => ThreadSafe.IsMainThread ? 1 : 2;
 	internal static TracingOptions? Options { get; private set; }
 	internal static long StartTimeTicks { get; private set; }
 
