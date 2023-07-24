@@ -18,7 +18,6 @@ internal sealed class TraceEventConverter : JsonConverter<TraceEvent>
 		writer.WriteString( "name", value.Name );
 		writer.WriteString( "cat", string.Join( ',', value.Categories ) );
 		writer.WriteString( "ph", value.Type.ToChromeTraceFormat() );
-		writer.WriteNumber( "pid", 1 );
 		writer.WriteNumber( "tid", value.ThreadId );
 
 		// Tracy compatability.
