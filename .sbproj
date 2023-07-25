@@ -3,7 +3,7 @@
   "Type": "library",
   "Org": "gooman",
   "Ident": "perf_tracing",
-  "Tags": null,
+  "Tags": "performance library tracing",
   "Schema": 1,
   "HasAssets": false,
   "AssetsPath": "",
