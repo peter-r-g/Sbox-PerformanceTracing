@@ -47,29 +47,7 @@ public static class Tracing
 	{
 		AddMetaData( "perfTracingVersion", Version );
 
-		if ( Game.IsServer )
-		{
-			AddMetaData( "realm", "server" );
-			AddMetaData( "serverSteamid", Game.ServerSteamId );
-			AddMetaData( "isDedicatedServer", Game.IsDedicatedServer );
-			AddMetaData( "tickRate", Game.TickRate );
-		}
-		else if ( Game.IsClient )
-		{
-			AddMetaData( "realm", "client" );
-			AddMetaData( "steamid", Game.SteamId );
-			AddMetaData( "isServerHost", Game.IsServerHost );
-			AddMetaData( "tickRate", Game.TickRate );
-		}
-		// Menu.
-		else
-		{
-			AddMetaData( "realm", "menu" );
-		}
-
-		if ( Game.IsDedicatedServer )
-			return;
-
+		AddMetaData( "steamid", Game.SteamId );
 		AddMetaData( "isEditorRunning", Game.IsEditor );
 		AddMetaData( "isHandheld", Game.IsRunningOnHandheld );
 		AddMetaData( "isVr", Game.IsRunningInVR );
@@ -110,14 +88,11 @@ public static class Tracing
 	/// </summary>
 	/// <param name="stopTracing">Whether or not to stop tracing after copying the trace data to clipboard.</param>
 	/// <exception cref="InvalidOperationException">Thrown when trying to copy to clipboard when no trace is running.</exception>
-	/// <exception cref="Exception">Thrown when invoking this method from outside the client realm.</exception>
 	/// <exception cref="NotSupportedException">Thrown when the storage provider does not support writing data to a stream.</exception>
 	public static void CopyToClipboard( bool stopTracing = false )
 	{
 		if ( !IsRunning )
 			throw new InvalidOperationException( "There is no trace running" );
-
-		Game.AssertClient();
 
 		using ( var stream = new MemoryStream() )
 		{
