@@ -29,6 +29,9 @@ public sealed class CounterTrace : IDisposable
 		Name = name;
 		if ( categories.Any() )
 			Categories = categories.ToImmutableArray();
+		else
+			Categories = Tracing.DefaultCategories;
+
 		FilePath = filePath;
 		LineNumber = lineNumber;
 
