@@ -5,24 +5,22 @@
   "Ident": "perf_tracing",
   "Tags": "performance library tracing",
   "Schema": 1,
-  "HasAssets": false,
-  "AssetsPath": "",
+  "IncludeSourceFiles": false,
   "Resources": null,
-  "MenuResources": null,
-  "HasCode": true,
-  "CodePath": ".",
   "PackageReferences": [],
   "EditorReferences": null,
   "Metadata": {
-    "ProjectTemplate": null,
     "CsProjName": "",
     "Compiler": {
       "RootNamespace": "PerformanceTracing",
       "DefineConstants": "SANDBOX;ADDON;DEBUG",
-      "NoWarn": "1701;1702;",
+      "NoWarn": "1701;1702;1591;",
+      "WarningsAsErrors": "",
       "Nullables": true,
-      "References": [],
-      "DistinctReferences": []
+      "Whitelist": true,
+      "AssemblyReferences": [],
+      "IgnoreFolders": [],
+      "DistinctAssemblyReferences": []
     }
   }
 }
