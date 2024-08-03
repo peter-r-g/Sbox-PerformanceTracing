@@ -18,7 +18,7 @@ public sealed class PerformanceTrace : IDisposable
 	private static readonly PerformanceTrace disabledTrace = new();
 
 	private string Name { get; set; } = string.Empty;
-	private ImmutableArray<string> Categories { get; set; } = ImmutableArray.Create( "Uncategorized" );
+	private ImmutableArray<string> Categories { get; set; } = Tracing.DefaultCategories;
 	private string? FilePath { get; set; }
 	private int? LineNumber { get; set; }
 	private string? StackTrace { get; set; }
