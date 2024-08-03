@@ -15,6 +15,7 @@ namespace PerformanceTracing.Traces;
 public sealed class CounterTrace : IDisposable
 {
 	internal static ConcurrentQueue<CounterTrace> UnusedTraces { get; } = new();
+	private static readonly CounterTrace disabledTrace = new();
 
 	private string Name { get; set; } = string.Empty;
 	private ImmutableArray<string> Categories { get; set; } = ImmutableArray.Create( "Uncategorized" );
@@ -73,6 +74,9 @@ public sealed class CounterTrace : IDisposable
 	/// <inheritdoc/>
 	public void Dispose()
 	{
+		if ( ReferenceEquals( this, disabledTrace ) )
+			return;
+
 		UnusedTraces.Enqueue( this );
 	}
 
@@ -85,7 +89,7 @@ public sealed class CounterTrace : IDisposable
 	public static CounterTrace New( string name, double initialValue )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace();
+			return disabledTrace;
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( CounterTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
@@ -104,7 +108,7 @@ public sealed class CounterTrace : IDisposable
 	public static CounterTrace New( string name, IEnumerable<string> categories, double initialValue )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace();
+			return disabledTrace;
 
 		if ( !UnusedTraces!.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( CounterTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Counter}]" );
@@ -127,7 +131,7 @@ public sealed class CounterTrace : IDisposable
 		[CallerLineNumber] int? lineNumber = null )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace();
+			return disabledTrace;
 
 		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );
@@ -154,7 +158,7 @@ public sealed class CounterTrace : IDisposable
 		[CallerLineNumber] int? lineNumber = null )
 	{
 		if ( !Tracing.IsRunning )
-			return new CounterTrace();
+			return disabledTrace;
 
 		if ( !Tracing.Options!.UseSimpleNames )
 			name = StackTraceHelper.GetTraceEntrySignature( 1 );

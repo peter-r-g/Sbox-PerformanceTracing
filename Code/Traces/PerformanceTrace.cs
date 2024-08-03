@@ -15,6 +15,7 @@ namespace PerformanceTracing.Traces;
 public sealed class PerformanceTrace : IDisposable
 {
 	internal static ConcurrentQueue<PerformanceTrace> UnusedTraces { get; } = new();
+	private static readonly PerformanceTrace disabledTrace = new();
 
 	private string Name { get; set; } = string.Empty;
 	private ImmutableArray<string> Categories { get; set; } = ImmutableArray.Create( "Uncategorized" );
@@ -40,7 +41,7 @@ public sealed class PerformanceTrace : IDisposable
 	public void Dispose()
 	{
 		var elapsedTime = Stopwatch.GetElapsedTime( StartTicks );
-		if ( !Tracing.IsRunning )
+		if ( !Tracing.IsRunning || ReferenceEquals( this, disabledTrace ) )
 			return;
 
 		var startTime = Stopwatch.GetElapsedTime( Tracing.StartTimeTicks, StartTicks );
@@ -73,7 +74,7 @@ public sealed class PerformanceTrace : IDisposable
 	public static PerformanceTrace New( string name )
 	{
 		if ( !Tracing.IsRunning )
-			return new PerformanceTrace();
+			return disabledTrace;
 
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
@@ -91,7 +92,7 @@ public sealed class PerformanceTrace : IDisposable
 	public static PerformanceTrace New( string name, IEnumerable<string> categories )
 	{
 		if ( !Tracing.IsRunning )
-			return new PerformanceTrace();
+			return disabledTrace;
 
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
@@ -112,7 +113,7 @@ public sealed class PerformanceTrace : IDisposable
 		[CallerLineNumber] int? lineNumber = null )
 	{
 		if ( !Tracing.IsRunning )
-			return new PerformanceTrace();
+			return disabledTrace;
 
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
@@ -138,7 +139,7 @@ public sealed class PerformanceTrace : IDisposable
 		[CallerLineNumber] int? lineNumber = null )
 	{
 		if ( !Tracing.IsRunning )
-			return new PerformanceTrace();
+			return disabledTrace;
 
 		if ( !UnusedTraces.TryDequeue( out var trace ) )
 			throw new InvalidOperationException( $"The {nameof( PerformanceTrace )} pool has been exhausted. Consider upping {nameof( TracingOptions.MaxConcurrentTraces )}[{TraceType.Performance}]" );
