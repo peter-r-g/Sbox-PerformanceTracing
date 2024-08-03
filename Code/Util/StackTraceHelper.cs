@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
-namespace PerformanceTracing;
+namespace PerformanceTracing.Util;
 
 internal static class StackTraceHelper
 {

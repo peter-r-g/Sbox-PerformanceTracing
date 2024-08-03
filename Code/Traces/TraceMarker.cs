@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Collections.Immutable;
 using Sandbox;
+using PerformanceTracing.Util;
 
 namespace PerformanceTracing.Traces;
 
