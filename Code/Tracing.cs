@@ -22,7 +22,7 @@ public static class Tracing
 	/// <summary>
 	/// The current version of the Performance Tracing library.
 	/// </summary>
-	public const string Version = "2.0.0";
+	public const string Version = "3.0.0";
 
 	internal static readonly ImmutableArray<string> DefaultCategories = ImmutableArray.Create( "Uncategorized" );
 
