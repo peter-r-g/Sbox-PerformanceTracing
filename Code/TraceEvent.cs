@@ -14,7 +14,7 @@ public struct TraceEvent
 	/// <summary>
 	/// The categories that this trace fits into.
 	/// </summary>
-	public ImmutableArray<string> Categories { get; internal init; } = ImmutableArray.Create( "Uncategorized" );
+	public ImmutableArray<string> Categories { get; internal init; } = Tracing.DefaultCategories;
 	/// <summary>
 	/// The type of trace that this is.
 	/// </summary>
