@@ -28,7 +28,7 @@ public abstract class TraceStorageProvider
 	/// Adds an event to the current trace.
 	/// </summary>
 	/// <param name="traceEvent">The event to add.</param>
-	public abstract void AddEvent( in TraceEvent traceEvent );
+	public abstract void AddEvent( TraceEvent traceEvent );
 
 	/// <summary>
 	/// Writes the providers data to a stream.

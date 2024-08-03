@@ -5,7 +5,7 @@ namespace PerformanceTracing;
 /// <summary>
 /// Contains all information in regards to an event that occurred during tracing.
 /// </summary>
-public struct TraceEvent
+public sealed class TraceEvent
 {
 	/// <summary>
 	/// The name of the trace.
@@ -58,16 +58,9 @@ public struct TraceEvent
 	/// <summary>
 	/// A shorthand getter to <see cref="Value"/> as a <see cref="double"/>.
 	/// </summary>
-	public readonly double ValueNumber => (double)Value!;
+	public double ValueNumber => (double)Value!;
 	/// <summary>
 	/// A shorthand getter to <see cref="Value"/> as a <see cref="string"/>.
 	/// </summary>
-	public readonly string ValueString => (string)Value!;
-
-	/// <summary>
-	/// Initializes a default instance of <see cref="TraceEvent"/>.
-	/// </summary>
-	public TraceEvent()
-	{
-	}
+	public string ValueString => (string)Value!;
 }

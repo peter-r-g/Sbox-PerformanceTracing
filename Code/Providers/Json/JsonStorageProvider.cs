@@ -64,7 +64,7 @@ public sealed class JsonStorageProvider : TraceStorageProvider
 	}
 
 	/// <inheritdoc/>
-	public override void AddEvent( in TraceEvent traceEvent )
+	public override void AddEvent( TraceEvent traceEvent )
 	{
 		var threadId = ThreadSafe.CurrentThreadId;
 		if ( !NamedThreads!.Contains( threadId ) )
