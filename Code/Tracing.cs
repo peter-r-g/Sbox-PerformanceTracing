@@ -50,7 +50,10 @@ public static class Tracing
 	{
 		AddMetaData( "perfTracingVersion", Version );
 
+		AddMetaData( "appid", Game.AppId );
+		AddMetaData( "ident", Game.Ident );
 		AddMetaData( "steamid", Game.SteamId );
+
 		AddMetaData( "isEditorRunning", Game.IsEditor );
 		AddMetaData( "isHandheld", Game.IsRunningOnHandheld );
 		AddMetaData( "isVr", Game.IsRunningInVR );
